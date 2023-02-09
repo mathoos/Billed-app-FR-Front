@@ -20,6 +20,17 @@ export default class NewBill {
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     const filePath = e.target.value.split(/\\/g)
     const fileName = filePath[filePath.length-1]
+
+    // Récupérer l'extension du justificatif
+    let fileExtension = fileName.toLowerCase()
+    let posExtension = fileExtension.lastIndexOf(".")
+    fileExtension = fileExtension.substring(posExtension+1)
+    console.log(fileExtension)
+
+    if (fileExtension != "jpg" && fileExtension != "jpeg" && fileExtension != "png") {
+      return alert(`l'extension ${fileExtension} n'est pas acceptée`) 
+    }
+
     const formData = new FormData()
     const email = JSON.parse(localStorage.getItem("user")).email
     formData.append('file', file)
