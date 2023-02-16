@@ -88,7 +88,6 @@ export default class {
 
   // Pour afficher la note au click
   handleEditTicket(e, bill, bills) {
-    e.stopImmediatePropagation()
     if (this.counter === undefined || this.id !== bill.id) this.counter = 0
     if (this.id === undefined || this.id !== bill.id) this.id = bill.id
     if (this.counter % 2 === 0) {
@@ -149,8 +148,10 @@ export default class {
       this.counter ++
     }
 
-    bills.forEach(bill => {
-      $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+    bills.forEach(bill => {    
+      if((index === 1 && bill.status === 'pending') || (index === 2 && bill.status === 'accepted') || (index === 3 && bill.status === 'refused')) {
+        $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills))
+      }
     })
 
     return bills
