@@ -25,7 +25,6 @@ export default class NewBill {
     let fileExtension = fileName.toLowerCase()
     let posExtension = fileExtension.lastIndexOf(".")
     fileExtension = fileExtension.substring(posExtension+1)
-    console.log(fileExtension)
 
     if (fileExtension != "jpg" && fileExtension != "jpeg" && fileExtension != "png") {
       return alert(`l'extension ${fileExtension} n'est pas acceptée`) 
