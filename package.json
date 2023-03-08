@@ -2,7 +2,7 @@
   "scripts": {
     "test": "jest --coverage --noStackTrace --silent",
     "tdd" : "jest --watch",
-    "unitTest" : "jest --runTestsByPath"
+    "unitTest" : "jest --coverage --runTestsByPath"
   },
   "jest": {
     "verbose": false,
