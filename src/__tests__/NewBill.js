@@ -2,17 +2,36 @@
  * @jest-environment jsdom
  */
 
-import { screen } from "@testing-library/dom"
-import NewBillUI from "../views/NewBillUI.js"
-import NewBill from "../containers/NewBill.js"
+import { fireEvent, screen } from "@testing-library/dom"
+import "@testing-library/jest-dom"
+import userEvent from "@testing-library/user-event"
+import mockStore from '../__mocks__/store'
+import router from "../app/Router"
+import { ROUTES, ROUTES_PATH } from "../constants/routes"
+import NewBillUI from "../views/NewBillUI"
+import store from '../app/store'
 
 
 describe("Given I am connected as an employee", () => {
+
+  function onNavigate(pathname) {
+    document.body.innerHTML = ROUTES({ pathname })
+  }
+
   describe("When I am on NewBill Page", () => {
-    test("Then ...", () => {
-      const html = NewBillUI()
-      document.body.innerHTML = html
-      //to-do write assertion
+    test("then the mail icon in vertical layout should be highlighted", () => {
+
+      window.localStorage.setItem('user', JSON.stringify({
+        type: 'Employee'
+      }))
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.NewBill)
+
+      const windowIcon = screen.getByTestId('icon-mail')
+      expect(windowIcon).toHaveClass('active-icon')
     })
   })
 })
