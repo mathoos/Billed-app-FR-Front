@@ -5,7 +5,6 @@
 import { fireEvent, screen } from "@testing-library/dom"
 import "@testing-library/jest-dom"
 import userEvent from "@testing-library/user-event"
-import mockStore from '../__mocks__/store'
 import router from "../app/Router"
 import { ROUTES, ROUTES_PATH } from "../constants/routes"
 import NewBillUI from "../views/NewBillUI"
@@ -33,5 +32,7 @@ describe("Given I am connected as an employee", () => {
       const windowIcon = screen.getByTestId('icon-mail')
       expect(windowIcon).toHaveClass('active-icon')
     })
+
+    
   })
 })
