@@ -32,7 +32,6 @@ describe("Given I am connected as an employee", () => {
       window.onNavigate(ROUTES_PATH.Bills)
       await waitFor(() => screen.getByTestId('icon-window'))
       const windowIcon = screen.getByTestId('icon-window')
-      //to-do write expect expression
       expect(windowIcon.classList.contains('active-icon')).toBeTruthy();
     })
 
@@ -116,12 +115,15 @@ describe("Given I am connected as an employee", () => {
         const newBillBtn = screen.getByTestId("btn-new-bill")
         userEvent.click(newBillBtn)
         await waitFor(() => screen.getByText("Envoyer une note de frais"))
-        //expect(screen.getAllByText("Envoyer une note de frais")).toBeTruthy()
         expect(screen.queryByTestId('form-new-bill')).toBeTruthy()       
       })
     })
 
-    
+    describe('When I click on log out icon', () => {
+      test('Then I am sent back on Login page', async () => {
+      
+      })
+    }) 
   }) 
 })
 
