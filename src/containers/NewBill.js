@@ -27,7 +27,12 @@ export default class NewBill {
     fileExtension = fileExtension.substring(posExtension+1)
 
     if (fileExtension != "jpg" && fileExtension != "jpeg" && fileExtension != "png") {
+      e.target.setAttribute("data-error", true)
+      e.target.value = ""
       return alert(`l'extension ${fileExtension} n'est pas acceptée`) 
+    }
+    else{
+      e.target.setAttribute("data-error", false)
     }
 
     const formData = new FormData()
@@ -50,6 +55,7 @@ export default class NewBill {
         this.fileName = fileName
       }).catch(error => console.error(error))
   }
+  
   handleSubmit = e => {
     e.preventDefault()
     console.log('e.target.querySelector(`input[data-testid="datepicker"]`).value', e.target.querySelector(`input[data-testid="datepicker"]`).value)

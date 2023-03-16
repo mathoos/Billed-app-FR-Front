@@ -11,6 +11,8 @@ import mockStore from "../__mocks__/store";
 import Bills from "../containers/Bills.js";
 import router from "../app/Router.js";
 import userEvent from "@testing-library/user-event";
+import '@testing-library/jest-dom/extend-expect'
+jest.mock("../app/store", () => mockStore)
 
 
 describe("Given I am connected as an employee", () => {
@@ -35,6 +37,7 @@ describe("Given I am connected as an employee", () => {
       expect(windowIcon.classList.contains('active-icon')).toBeTruthy();
     })
 
+
     test("Then bills should be ordered from earliest to latest", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       const root = document.createElement("div")
@@ -42,12 +45,29 @@ describe("Given I am connected as an employee", () => {
       document.body.append(root)
       router()
       window.onNavigate(ROUTES_PATH.Bills)
-     
-      // const dates = screen.getAllByText("/^(19|20)\d\d[- /.](0[1-9]|1[012])[- /.](0[1-9]|[12][0-9]|3[01])$/i).map(a => a.innerHTML")
-      // const antiChrono = (a, b) => ((a < b) ? 1 : -1)
-      // const datesSorted = [...dates].sort(antiChrono)
       const dates = screen.getAllByTestId("date").map(a => a.innerHTML)
       expect(dates).toEqual(["4 Avr. 04", "3 Mar. 03", "2 Fév. 02", "1 Jan. 01"])
+    });
+
+    test("Then the first bill contains correct data", () => {
+      document.body.innerHTML = BillsUI({ data: bills })
+      const root = document.createElement("div")
+      root.setAttribute("id", "root")
+      document.body.append(root)
+      router()
+      window.onNavigate(ROUTES_PATH.Bills)
+
+      const typeBill = screen.getAllByTestId("type");
+      const nameBill = screen.getAllByTestId("name");
+      const dateBill = screen.getAllByTestId("date");
+      const amountBill = screen.getAllByTestId("amount");
+      const statusBill = screen.getAllByTestId("status");
+
+      expect(typeBill[0].innerHTML).toBe("Hôtel et logement");     
+      expect(nameBill[0].innerHTML).toBe("encore");     
+      expect(dateBill[0].innerHTML).toBe("4 Avr. 04");     
+      expect(amountBill[0].innerHTML).toBe("400 €");     
+      expect(statusBill[0].innerHTML).toBe("pending");
     });
 
 
@@ -57,14 +77,10 @@ describe("Given I am connected as an employee", () => {
       expect(icons.length).toBeGreaterThan(0);
     });
 
-
     // On vérifie que les bills dans store.js sont bien 4
     test("It returns 4 bills", async () => {
-      const bills = new Bills({ store: mockStore, document });
-      const billsRetrieved = await bills.getBills();
-      expect(billsRetrieved.length).toBe(4);
-      const getBillsMock = jest.fn((e) => bills.getBills());
-      expect(getBillsMock).not.toHaveBeenCalled();
+      const numberOfBills = screen.getAllByTestId("row");
+      expect(numberOfBills).toHaveLength(4);
     });
 
 
@@ -118,12 +134,6 @@ describe("Given I am connected as an employee", () => {
         expect(screen.queryByTestId('form-new-bill')).toBeTruthy()       
       })
     })
-
-    describe('When I click on log out icon', () => {
-      test('Then I am sent back on Login page', async () => {
-      
-      })
-    }) 
   }) 
 })
 
