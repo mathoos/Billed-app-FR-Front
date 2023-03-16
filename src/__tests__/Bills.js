@@ -57,17 +57,17 @@ describe("Given I am connected as an employee", () => {
       router()
       window.onNavigate(ROUTES_PATH.Bills)
 
-      const typeBill = screen.getAllByTestId("type");
-      const nameBill = screen.getAllByTestId("name");
-      const dateBill = screen.getAllByTestId("date");
-      const amountBill = screen.getAllByTestId("amount");
-      const statusBill = screen.getAllByTestId("status");
+      const typeBill = screen.getByTestId("type");
+      const nameBill = screen.getByTestId("name");
+      const dateBill = screen.getByTestId("date");
+      const amountBill = screen.getByTestId("amount");
+      const statusBill = screen.getByTestId("status");
 
-      expect(typeBill[0].innerHTML).toBe("Hôtel et logement");     
-      expect(nameBill[0].innerHTML).toBe("encore");     
-      expect(dateBill[0].innerHTML).toBe("4 Avr. 04");     
-      expect(amountBill[0].innerHTML).toBe("400 €");     
-      expect(statusBill[0].innerHTML).toBe("pending");
+      expect(typeBill.innerHTML).toBe("Hôtel et logement");     
+      expect(nameBill.innerHTML).toBe("encore");     
+      expect(dateBill.innerHTML).toBe("4 Avr. 04");     
+      expect(amountBill.innerHTML).toBe("400 €");     
+      expect(statusBill.innerHTML).toBe("pending");
     });
 
 
@@ -78,7 +78,7 @@ describe("Given I am connected as an employee", () => {
     });
 
     // On vérifie que les bills dans store.js sont bien 4
-    test("It returns 4 bills", async () => {
+    it("should return 4 bills", async () => {
       const numberOfBills = screen.getAllByTestId("row");
       expect(numberOfBills).toHaveLength(4);
     });

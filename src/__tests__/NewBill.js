@@ -63,10 +63,21 @@ describe("Given I am connected as an employee", () => {
 
     describe('When I select a file with a correct extension', () => {
       test('Then the file should be uploaded"', async () => {
-        // const file = screen.getByTestId("file");
-        // const fakeFile = new File(["jpg"], "test.jpg", {type: "image/jpg"})
+        window.alert = jest.fn()
+        //window.fetch = jest.fn().mockResolvedValue({})
+        const file = screen.getByTestId("file");
+        // const fakeFile = new File(["test.jpg"], "test.jpg", {type: "image/jpg"})
         // userEvent.upload(file, fakeFile)  
-        // expect(file.value).toBe("test.jpg")
+        console.log(file.dataset)
+      
+        // Simulate if the file is an jpg extension
+        fireEvent.change(file, {
+          target: {
+            files: [new File(["file.jpg"], "file.jpg", { type: "file/jpg" })],
+          },       
+        });
+        expect(file.dataset.error).toBeFalsy()     
+        expect(window.alert).not.toHaveBeenCalled()
       });
     })
 
