@@ -19,15 +19,12 @@ export default class NewBill {
     e.preventDefault()
     const file = this.document.querySelector(`input[data-testid="file"]`).files[0]
     //const filePath = e.target.value.split(/\\/g)
-    console.log(file.name)
     const fileName = file.name
 
     // Récupérer l'extension du justificatif
     let fileExtension = fileName.toLowerCase()
     let posExtension = fileExtension.lastIndexOf(".")
     fileExtension = fileExtension.substring(posExtension+1)
-
-    console.log(fileName)
     
 
     if (fileExtension != "jpg" && fileExtension != "jpeg" && fileExtension != "png") {
@@ -53,7 +50,6 @@ export default class NewBill {
         }
       })
       .then(({fileUrl, key}) => {
-        console.log(fileUrl)
         this.billId = key
         this.fileUrl = fileUrl
         this.fileName = fileName

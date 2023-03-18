@@ -2,17 +2,18 @@
  * @jest-environment jsdom
  */
 
+import '@testing-library/jest-dom/extend-expect'
+import userEvent from "@testing-library/user-event";
 import { screen, waitFor } from "@testing-library/dom"
 import BillsUI from "../views/BillsUI.js"
 import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
-import mockStore from "../__mocks__/store";
 import Bills from "../containers/Bills.js";
 import router from "../app/Router.js";
-import userEvent from "@testing-library/user-event";
-import '@testing-library/jest-dom/extend-expect'
-jest.mock("../app/store", () => mockStore)
+import store from "../__mocks__/store";
+
+
 
 
 describe("Given I am connected as an employee", () => {
@@ -57,17 +58,17 @@ describe("Given I am connected as an employee", () => {
       router()
       window.onNavigate(ROUTES_PATH.Bills)
 
-      const typeBill = screen.getByTestId("type");
-      const nameBill = screen.getByTestId("name");
-      const dateBill = screen.getByTestId("date");
-      const amountBill = screen.getByTestId("amount");
-      const statusBill = screen.getByTestId("status");
+      const typeBill = screen.getAllByTestId("type");
+      const nameBill = screen.getAllByTestId("name");
+      const dateBill = screen.getAllByTestId("date");
+      const amountBill = screen.getAllByTestId("amount");
+      const statusBill = screen.getAllByTestId("status");
 
-      expect(typeBill.innerHTML).toBe("Hôtel et logement");     
-      expect(nameBill.innerHTML).toBe("encore");     
-      expect(dateBill.innerHTML).toBe("4 Avr. 04");     
-      expect(amountBill.innerHTML).toBe("400 €");     
-      expect(statusBill.innerHTML).toBe("pending");
+      expect(typeBill[0].innerHTML).toBe("Hôtel et logement");     
+      expect(nameBill[0].innerHTML).toBe("encore");     
+      expect(dateBill[0].innerHTML).toBe("4 Avr. 04");     
+      expect(amountBill[0].innerHTML).toBe("400 €");     
+      expect(statusBill[0].innerHTML).toBe("pending");
     });
 
 
@@ -134,9 +135,50 @@ describe("Given I am connected as an employee", () => {
         expect(screen.queryByTestId('form-new-bill')).toBeTruthy()       
       })
     })
+
+    describe("When it's loading", () => {
+      test("Then it should have a loading page", () => {
+        // Build DOM as if page is loading
+        const html = BillsUI({
+          data: [],
+          loading: true,
+        });
+        document.body.innerHTML = html;
+  
+        expect(screen.getAllByText("Loading...")).toBeTruthy();
+      });
+    });
   }) 
 })
 
+describe("When I navigate to Dashboard employee", () => {
+  test("fetches bills from mock API GET", async () => {
+    const getSpy = jest.spyOn(store, "get");
+    const bills = await store.get();
+    expect(getSpy).toHaveBeenCalledTimes(1);
+    expect(bills.data.length).toBe(4);
+  });
+
+  test("fetches bills from an API and fails with 404 message error", async () => {
+    store.get.mockImplementationOnce(() =>
+      Promise.reject(new Error("Erreur 404"))
+    );
+    const html = BillsUI({ error: "Erreur 404" });
+    document.body.innerHTML = html;
+    const message = await screen.getByText(/Erreur 404/);
+    expect(message).toBeTruthy();
+  });
+
+  test("fetches messages from an API and fails with 500 message error", async () => {
+    store.get.mockImplementationOnce(() =>
+      Promise.reject(new Error("Erreur 500"))
+    );
+    const html = BillsUI({ error: "Erreur 500" });
+    document.body.innerHTML = html;
+    const message = await screen.getByText(/Erreur 500/);
+    expect(message).toBeTruthy();
+  });
+});
 
 
 
