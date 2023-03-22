@@ -10,10 +10,11 @@ import { bills } from "../fixtures/bills.js"
 import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
-import router from "../app/Router.js";
 import mockStore from "../__mocks__/store";
+import router from "../app/Router.js";
 
 
+jest.mock("../app/store", () => mockStore)
 
 
 describe("Given I am connected as an employee", () => {
@@ -97,8 +98,9 @@ describe("Given I am connected as an employee", () => {
         const eyeIcons = screen.getAllByTestId("icon-eye");
         eyeIcons.forEach((eye) => {
           eye.click()
-          expect(newBills.handleClickIconEye).toBeCalled();        
-        })
+          expect(newBills.handleClickIconEye).toBeCalled();    
+          
+        })  
       });
     });
 
@@ -133,7 +135,53 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getAllByText("Loading...")).toBeTruthy();
       });
     });
-  }) 
+
+    describe("When there is an error", () => {
+      test("then bills are fetched from the API and it fails with a 404 message error", async () => {
+
+        jest.spyOn(mockStore, "bills")
+  
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list : () =>  {
+              return Promise.reject(new Error("Erreur 404"))
+            }
+          }})
+
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+  
+        await new Promise(process.nextTick)
+        const message = await screen.findByText(/Erreur 404/)
+        expect(message).toBeTruthy()
+      });
+      
+      test("then bills are fetched from the API and it fails with a 500 message error", async () => {
+
+        jest.spyOn(mockStore, "bills")
+  
+        mockStore.bills.mockImplementationOnce(() => {
+          return {
+            list : () =>  {
+              return Promise.reject(new Error("Erreur 500"))
+            }
+          }})
+
+        const root = document.createElement("div")
+        root.setAttribute("id", "root")
+        document.body.append(root)
+        router()
+        window.onNavigate(ROUTES_PATH.Bills)
+  
+        await new Promise(process.nextTick)
+        const message = await screen.findByText(/Erreur 500/)
+        expect(message).toBeTruthy()
+      })
+    });
+  });
 })
 
 
