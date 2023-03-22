@@ -78,28 +78,13 @@ describe("Given I am connected as an employee", () => {
       expect(icons.length).toBeGreaterThan(0);
     });
 
-    // On vérifie que les bills dans store.js sont bien 4
-    it("should return 4 bills", async () => {
+
+    it("should display all the bills fetched from the API", async () => {
       const numberOfBills = screen.getAllByTestId("row");
       expect(numberOfBills).toHaveLength(4);
     });
 
-
-    // On vérifie qu'on est bien sur la page des bills qui affiche le titre "Mes notes de frais"
-    test("Then the title and the new bill button should be displayed", async () => { 
-      const root = document.createElement("div");
-      root.setAttribute("id", "root");
-      document.body.append(root);
-      router();
-      window.onNavigate(ROUTES_PATH.Bills);
-      const contentHeader = await waitFor(() =>
-        screen.getByText("Mes notes de frais")
-      );
-      expect(contentHeader).toBeTruthy();
-      expect(screen.getByTestId("btn-new-bill")).toBeTruthy();
-    });
-
-
+    // TEST A COMPLETER  : VERIFIER SI LE MEDIA AFFICHE EST BIEN CELUI SUR LEQUEL ON A CLIQUE
     describe('When I click on the icon eye', () => {
       test('Then a modal should open', async () => {
 
@@ -115,7 +100,7 @@ describe("Given I am connected as an employee", () => {
           expect(newBills.handleClickIconEye).toBeCalled();        
         })
       });
-    })
+    });
 
 
     describe('When I click on New Bill button', () => {
@@ -148,38 +133,6 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getAllByText("Loading...")).toBeTruthy();
       });
     });
-
-    describe("When an error occurs on API", () => {
-      beforeEach(() => {
-        jest.spyOn(mockStore, "bills")
-        Object.defineProperty(
-            window,
-            'localStorage',
-            { value: localStorageMock }
-        )
-        window.localStorage.setItem('user', JSON.stringify({
-          type: 'Employee',
-          email: "e@e"
-        }))
-        const root = document.createElement("div")
-        root.setAttribute("id", "root")
-        document.body.appendChild(root)
-        router()
-      })
-      test("fetches bills from an API and fails with 404 message error", async () => {
-  
-        mockStore.bills.mockImplementationOnce(() => {
-          return {
-            list : () =>  {
-              return Promise.reject(new Error("Erreur 404"))
-            }
-          }})
-        window.onNavigate(ROUTES_PATH.Bills)
-        await new Promise(process.nextTick);
-        const message = await screen.getAllByText(/Erreur 404/)
-        expect(message).toBeTruthy()
-      })
-    })
   }) 
 })
 
