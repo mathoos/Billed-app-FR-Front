@@ -11,6 +11,7 @@ import { ROUTES, ROUTES_PATH } from "../constants/routes.js";
 import { localStorageMock } from "../__mocks__/localStorage.js";
 import Bills from "../containers/Bills.js";
 import mockStore from "../__mocks__/store";
+import store from "../__mocks__/store";
 import router from "../app/Router.js";
 
 
@@ -22,10 +23,14 @@ describe("Given I am connected as an employee", () => {
     document.body.innerHTML = ROUTES({ pathname })
   }
 
-  Object.defineProperty(window, 'localStorage', { value: localStorageMock })
+  beforeEach(() => {
+    // On simule la connection à la page Employée
+    Object.defineProperty(window, 'localStorage', { value: localStorageMock })
     window.localStorage.setItem('user', JSON.stringify({
-      type: 'Employee'
-  }))
+      type: 'Employee',
+      email: "employee@test.tld"
+    }))    
+  })
 
   describe("When I am on Bills Page", () => {
     test("Then bill icon in vertical layout should be highlighted", async () => {
@@ -51,7 +56,7 @@ describe("Given I am connected as an employee", () => {
       expect(dates).toEqual(["4 Avr. 04", "3 Mar. 03", "2 Fév. 02", "1 Jan. 01"])
     });
 
-    test("Then the first bill contains correct data", () => {
+    test("Then the first bill contains the correct data", () => {
       document.body.innerHTML = BillsUI({ data: bills })
       const root = document.createElement("div")
       root.setAttribute("id", "root")
@@ -85,9 +90,9 @@ describe("Given I am connected as an employee", () => {
       expect(numberOfBills).toHaveLength(4);
     });
 
-    // TEST A COMPLETER  : VERIFIER SI LE MEDIA AFFICHE EST BIEN CELUI SUR LEQUEL ON A CLIQUE
+
     describe('When I click on the icon eye', () => {
-      test('Then a modal should open', async () => {
+      test('Then handleClickIconEye function is called', async () => {
 
         $.fn.modal = jest.fn()
 
@@ -98,17 +103,45 @@ describe("Given I am connected as an employee", () => {
         const eyeIcons = screen.getAllByTestId("icon-eye");
         eyeIcons.forEach((eye) => {
           eye.click()
-          expect(newBills.handleClickIconEye).toBeCalled();    
-          
+          expect(newBills.handleClickIconEye).toBeCalled();            
         })  
+      });
+
+
+      test('Then a modal should open', async () => {
+        $.fn.modal = jest.fn()
+
+        document.body.innerHTML = BillsUI({ data: bills })
+        new Bills({ document, onNavigate: null, store: null, localStorage: null })
+
+        const eyeIcon = screen.getAllByTestId('icon-eye')[0]
+        userEvent.click(eyeIcon)
+
+        expect($.fn.modal).toHaveBeenCalledWith('show')
+      });
+
+
+      test("then a modal should display the correct media", () => {
+
+        document.body.innerHTML = BillsUI({ data: bills })
+        const newBills = new Bills({ document, onNavigate, store: null, localStorage: window.localStorage })
+
+        const icon = document.createElement("div");
+        icon.setAttribute("data-bill-url", "img.png");
+        newBills.handleClickIconEye(icon);
+        const img = document.querySelector(".bill-proof-container img")
+    
+        expect(img.src).toBe("http://localhost/img.png")     
       });
     });
 
 
     describe('When I click on New Bill button', () => {
       test('Then New Bill page should open', async () => {
+
         document.body.innerHTML = BillsUI({ data: bills })
-        new Bills({ document, onNavigate, store: null, localStorage: null })
+        new Bills({ document, onNavigate, store, localStorage: null })
+
 
         const root = document.createElement("div")
         root.setAttribute("id", "root")
@@ -119,10 +152,12 @@ describe("Given I am connected as an employee", () => {
         const newBillBtn = screen.getByTestId("btn-new-bill")
         userEvent.click(newBillBtn)
         await waitFor(() => screen.getByText("Envoyer une note de frais"))
-        expect(screen.queryByTestId('form-new-bill')).toBeTruthy()       
+        expect(screen.queryByTestId('form-new-bill')).toBeTruthy()
+       
       })
-    })
+    });
 
+    
     describe("When it's loading", () => {
       test("Then it should have a loading page", () => {
         // Build DOM as if page is loading
@@ -135,6 +170,7 @@ describe("Given I am connected as an employee", () => {
         expect(screen.getAllByText("Loading...")).toBeTruthy();
       });
     });
+
 
     describe("When there is an error", () => {
       test("then bills are fetched from the API and it fails with a 404 message error", async () => {
