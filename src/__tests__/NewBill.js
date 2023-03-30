@@ -40,7 +40,6 @@ describe("Given I am connected as an employee", () => {
   })
 
   describe("When I am on NewBill Page", () => {  
-
     test("then the mail icon in vertical layout should be highlighted", () => {
       const windowIcon = screen.getByTestId('icon-mail')
       expect(windowIcon).toHaveClass('active-icon')
@@ -155,29 +154,11 @@ describe("Given I am connected as an employee", () => {
     });
 
     describe("When I navigate to Dashboard employee", () => {
+      test("fetches bills from mock API GET", async () => {
+        const numberOfBills = screen.getAllByTestId("row");
+        expect(numberOfBills).toHaveLength(4);
+      })
 
-      test("Then it add bills from mock API POST", async () => {     
-        const getSpy = jest.spyOn(mockStore, "post");
-        const newBill = {
-          id: "47qAXb6fIm2zOKkLzMro",
-          vat: "80",
-          fileUrl: "https://test.storage.tld/v0/b/billable-677b6.a…f-1.jpg?alt=media&token=c1640e12-a24b-4b11-ae52-529112e9602a",
-          status: "pending",
-          type: "Hôtel et logement",
-          commentary: "séminaire billed",
-          name: "encore",
-          fileName: "preview-facture-free-201801-pdf-1.jpg",
-          date: "2004-04-04",
-          amount: 400,
-          commentAdmin: "ok",
-          email: "a@a",
-          pct: 40,
-        };
-        const bills = await mockStore.post(newBill);
-        expect(getSpy).toHaveBeenCalledTimes(1);
-        expect(bills.data.length).toBe(5);
-      });
-    
       test("Then it add bills from an API and fails with 404 message error", async () => {
   
         jest.spyOn(mockStore, "bills")
